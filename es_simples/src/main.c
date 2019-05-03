@@ -21,9 +21,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/uart.h"
 #include "driverlib/pin_map.h"
-
-#include "macro_loop.h"
-#include "processamento_dados.h"
+#include "driverlib/timer.h"
 
 //constantes de escala
 #define PLL_FREQ_24   
@@ -58,14 +56,18 @@
 
 #define N_DADOS 50
 
-bool escala = 0;
+#define JANELA_ESCALA_KILOHERTZ 1       //Em milissegundos
+#define JANELA_ESCALA_HERTZ 2000        //Em milissegundos
 
+bool escala = 0;
+bool leitura_realizada = false;
 //prot�tipos
 void            uart_puts(char * s);
 void            PortJIntHandler(void);
 uint32_t        getBordas();
 void            printFrequencia(float frequencia);
-
+void            SysTick_Handler(void);
+void            setJanela(uint32_t janela_ms);
 void main(void)
 {
  
@@ -99,7 +101,9 @@ void main(void)
   SysCtlPeripheralEnable(WAVE_INPUT_PERIPHERAL); // Habilita GPIO B (Entrada da onda = PB2)
   while(!SysCtlPeripheralReady(WAVE_INPUT_PERIPHERAL)); // Aguarda final da habilita��o
     
-  GPIOPinTypeGPIOInput(WAVE_INPUT_PORT, WAVE_INPUT_PIN); // Entrada da onda como entrada
+  //GPIOPinTypeGPIOInput(WAVE_INPUT_PORT, WAVE_INPUT_PIN); // Entrada da onda como entrada
+  GPIOPinTypeTimer(WAVE_INPUT_PORT, WAVE_INPUT_PIN);
+  GPIOPinConfigure(GPIO_PB2_T3CCP0);
   GPIOPadConfigSet(WAVE_INPUT_PORT, WAVE_INPUT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);//weak pull-up
   
   //GPIO bot�o
@@ -111,6 +115,19 @@ void main(void)
   GPIOIntTypeSet(SCALE_CHANGE_BUTTON_PORT, SCALE_CHANGE_BUTTON_PIN, GPIO_LOW_LEVEL); // push-button SW1
   GPIOIntEnable(SCALE_CHANGE_BUTTON_PORT, SCALE_CHANGE_INT_PIN);
  
+  //Configuração do Timer 3 - linkado com PB2
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
+  TimerConfigure(TIMER3_BASE, TIMER_CFG_ONE_SHOT_UP);
+  TimerControlEvent(TIMER0_BASE, TIMER_BOTH, TIMER_EVENT_BOTH_EDGES);
+  TimerLoadSet(TIMER0_BASE, TIMER_BOTH, 0);
+  TimerEnable(TIMER0_BASE, TIMER_BOTH);
+  //TimerMatchSet
+
+  //Systick Configuration
+  SysTickEnable();
+  setJanela(JANELA_ESCALA_KILOHERTZ);
+  SysTickIntEnable();
+
   //Interrup��es
   IntEnable(INT_GPIOJ);//habilita interrup��o do portJ - bot�o de escala
   IntMasterEnable();//habilita todas as interrup��es
@@ -208,4 +225,14 @@ void uart_puts(char * s) {
 void PortJIntHandler(void)
 {
   escala = !escala;
+}
+
+void SysTick_Handler(void){
+    leitura_realizada = true;
+    SysTickDisable();
+} // SysTick_Handler
+
+void setJanela(uint32_t janela_ms)
+{
+    SysTickPeriodSet((PLL_FREQ/1000) * janela_ms); // 
 }

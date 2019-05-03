@@ -1,17 +1,17 @@
-"E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto\es_simples\src\main.c"
+"E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW\es_simples\src\main.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto\es_simples\src
+E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW\es_simples\src
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto\es_simples\..\..\..
+E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW\es_simples\..\..\..
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto\es_simples\..
+E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW\es_simples\..
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto\es_simples\..\inc
+E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW\es_simples\..\inc
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto\es_simples\..\driverlib
+E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW\es_simples\..\driverlib
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I
@@ -21,13 +21,13 @@ C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc\c
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos
+E:\UTFPR\9º Período\Embarcados
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto
+E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto\inc
+E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW\inc
 -I
-E:\UTFPR\9º Período\Embarcados\Projetos\Lab0_V1.0\Lab0FrequencimetroFoto\driverlib
+E:\UTFPR\9º Período\Embarcados\Projetos\Lab2FrequencimetroHW\driverlib
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I
