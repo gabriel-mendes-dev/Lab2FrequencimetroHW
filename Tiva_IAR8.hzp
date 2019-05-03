@@ -1,0 +1,422 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="Tiva_IAR8" target="8" version="2">
+  <project Name="display">
+    <configuration
+      Name="Common"
+      Placement="Flash"
+      Target="TM4C1294NCPDT"
+      arm_architecture="v7EM"
+      arm_core_type="Cortex-M4"
+      arm_fpu_type="FPv4-SP-D16"
+      arm_gcc_target="arm-unknown-eabi"
+      arm_linker_heap_size="128"
+      arm_linker_process_stack_size="0"
+      arm_linker_stack_size="256"
+      arm_simulator_memory_simulation_filename="$(TargetsDir)/TIVA/TIVASimulatorMemory.dll"
+      arm_simulator_memory_simulation_parameter="TM4C1294NCPDT;0x100000;0x40000"
+      arm_target_debug_interface_type="ADIv5"
+      arm_target_loader_applicable_loaders="Flash"
+      arm_target_loader_default_loader="Flash"
+      arm_target_restrict_memory_accesses="Yes"
+      c_user_include_directories="$(TargetsDir)/TIVA/Include;$(TargetsDir)/CMSIS_3/CMSIS/Include"
+      debug_register_definition_file="$(TargetsDir)/TIVA/TM4C1294NCPDT.svd_Peripherals.xml"
+      linker_memory_map_file="$(TargetsDir)/TIVA/TM4C1294NCPDT_MemoryMap.xml"
+      linker_section_placement_file="$(StudioDir)/targets/Cortex_M/flash_placement.xml"
+      macros="FAMILY=TM4C129"
+      project_directory="display"
+      project_type="Executable"
+      property_groups_file_path="$(TargetsDir)/TIVA/propertyGroups.xml"
+      target_get_partname_script="GetPartName()"
+      target_match_partname_script="MatchPartName(&quot;$(Target)&quot;)"
+      target_reset_script="Reset()"
+      target_script_file="$(TargetsDir)/TIVA/TIVA_Target.js" />
+    <configuration
+      Name="Flash"
+      arm_target_flash_loader_file_path="$(TargetsDir)/TIVA/Release/Loader.elf"
+      target_reset_script="FLASHReset()" />
+    <folder Name="Source Files">
+      <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc" />
+      <file file_name="./src/cfaf128x128x16.c" />
+      <file file_name="./../driverlib/ewarm/Exe/driverlib.a" />
+      <file file_name="./../grlib/Debug/Exe/grlib.a" />
+      <file file_name="./src/main.c" />
+      <file file_name="./src/startup_ewarm.c" />
+      <file file_name="./src/system_tm4c1294ncpdt.c" />
+    </folder>
+    <folder Name="System Files">
+      <file file_name="$(StudioDir)/source/thumb_crt0.s" />
+      <file file_name="$(TargetsDir)/TIVA/TIVA_Startup.s" />
+      <file file_name="$(TargetsDir)/TIVA/Source/system_$(FAMILY).c" />
+    </folder>
+    <configuration
+      CMSIS_CORE="Yes"
+      Name="Debug"
+      c_preprocessor_definitions="ewarm;PART_TM4C1294NCPDT"
+      c_user_include_directories=";./../../..;./..;./../inc;./../driverlib" />
+    <configuration Name="Release" c_preprocessor_definitions="NDEBUG" />
+  </project>
+  <configuration Name="THUMB Debug" inherited_configurations="THUMB;Debug" />
+  <configuration
+    Name="THUMB"
+    Platform="ARM"
+    arm_instruction_set="Thumb"
+    arm_library_instruction_set="Thumb"
+    c_preprocessor_definitions="__THUMB"
+    hidden="Yes" />
+  <configuration
+    Name="Debug"
+    c_preprocessor_definitions="DEBUG"
+    gcc_debugging_level="Level 3"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="None"
+    hidden="Yes" />
+  <configuration
+    Name="THUMB Release"
+    inherited_configurations="THUMB;Release" />
+  <configuration
+    Name="Release"
+    c_preprocessor_definitions="NDEBUG"
+    gcc_debugging_level="None"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="Level 1"
+    hidden="Yes" />
+  <project Name="driverlib">
+    <configuration
+      Name="Common"
+      arm_core_type="Cortex-M4"
+      project_directory="driverlib"
+      project_type="Library" />
+    <configuration
+      Name="Debug"
+      build_output_file_name="ewarm/Exe/driverlib.a"
+      c_preprocessor_definitions="ewarm;PART_TM4C1294NCPDT"
+      c_user_include_directories=";./.." />
+    <folder Name="Source">
+      <file file_name="./adc.c" />
+      <file file_name="./aes.c" />
+      <file file_name="./can.c" />
+      <file file_name="./comp.c" />
+      <file file_name="./cpu.c" />
+      <file file_name="./crc.c" />
+      <file file_name="./des.c" />
+      <file file_name="./eeprom.c" />
+      <file file_name="./emac.c" />
+      <file file_name="./epi.c" />
+      <file file_name="./flash.c" />
+      <file file_name="./fpu.c" />
+      <file file_name="./gpio.c" />
+      <file file_name="./hibernate.c" />
+      <file file_name="./i2c.c" />
+      <file file_name="./interrupt.c" />
+      <file file_name="./lcd.c" />
+      <file file_name="./mpu.c" />
+      <file file_name="./onewire.c" />
+      <file file_name="./pwm.c" />
+      <file file_name="./qei.c" />
+      <file file_name="./shamd5.c" />
+      <file file_name="./ssi.c" />
+      <file file_name="./sw_crc.c" />
+      <file file_name="./sysctl.c" />
+      <file file_name="./sysexc.c" />
+      <file file_name="./systick.c" />
+      <file file_name="./timer.c" />
+      <file file_name="./uart.c" />
+      <file file_name="./udma.c" />
+      <file file_name="./usb.c" />
+      <file file_name="./watchdog.c" />
+    </folder>
+  </project>
+  <project Name="es_simples">
+    <configuration
+      Name="Common"
+      Placement="Flash"
+      Target="TM4C1294NCPDT"
+      arm_architecture="v7EM"
+      arm_core_type="Cortex-M4"
+      arm_fpu_type="FPv4-SP-D16"
+      arm_gcc_target="arm-unknown-eabi"
+      arm_linker_heap_size="128"
+      arm_linker_process_stack_size="0"
+      arm_linker_stack_size="256"
+      arm_simulator_memory_simulation_filename="$(TargetsDir)/TIVA/TIVASimulatorMemory.dll"
+      arm_simulator_memory_simulation_parameter="TM4C1294NCPDT;0x100000;0x40000"
+      arm_target_debug_interface_type="ADIv5"
+      arm_target_loader_applicable_loaders="Flash"
+      arm_target_loader_default_loader="Flash"
+      arm_target_restrict_memory_accesses="Yes"
+      c_user_include_directories="$(TargetsDir)/TIVA/Include;$(TargetsDir)/CMSIS_3/CMSIS/Include"
+      debug_register_definition_file="$(TargetsDir)/TIVA/TM4C1294NCPDT.svd_Peripherals.xml"
+      linker_memory_map_file="$(TargetsDir)/TIVA/TM4C1294NCPDT_MemoryMap.xml"
+      linker_section_placement_file="$(StudioDir)/targets/Cortex_M/flash_placement.xml"
+      macros="FAMILY=TM4C129"
+      project_directory="es_simples"
+      project_type="Executable"
+      property_groups_file_path="$(TargetsDir)/TIVA/propertyGroups.xml"
+      target_get_partname_script="GetPartName()"
+      target_match_partname_script="MatchPartName(&quot;$(Target)&quot;)"
+      target_reset_script="Reset()"
+      target_script_file="$(TargetsDir)/TIVA/TIVA_Target.js" />
+    <configuration
+      Name="Flash"
+      arm_target_flash_loader_file_path="$(TargetsDir)/TIVA/Release/Loader.elf"
+      target_reset_script="FLASHReset()" />
+    <folder Name="Source Files">
+      <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc" />
+      <file file_name="./../driverlib/ewarm/Exe/driverlib.a" />
+      <file file_name="./src/main.c" />
+      <file file_name="./src/startup_ewarm.c" />
+    </folder>
+    <folder Name="System Files">
+      <file file_name="$(StudioDir)/source/thumb_crt0.s" />
+      <file file_name="$(TargetsDir)/TIVA/TIVA_Startup.s" />
+      <file file_name="$(TargetsDir)/TIVA/Source/system_$(FAMILY).c" />
+    </folder>
+    <configuration
+      CMSIS_CORE="Yes"
+      Name="Debug"
+      c_preprocessor_definitions="ewarm;PART_TM4C1294NCPDT"
+      c_user_include_directories=";./../../..;./..;./../inc;./../driverlib" />
+    <configuration Name="Release" c_preprocessor_definitions="NDEBUG" />
+  </project>
+  <project Name="es_user">
+    <configuration
+      Name="Common"
+      Placement="Flash"
+      Target="TM4C1294NCPDT"
+      arm_architecture="v7EM"
+      arm_core_type="Cortex-M4"
+      arm_fpu_type="FPv4-SP-D16"
+      arm_gcc_target="arm-unknown-eabi"
+      arm_linker_heap_size="128"
+      arm_linker_process_stack_size="0"
+      arm_linker_stack_size="256"
+      arm_simulator_memory_simulation_filename="$(TargetsDir)/TIVA/TIVASimulatorMemory.dll"
+      arm_simulator_memory_simulation_parameter="TM4C1294NCPDT;0x100000;0x40000"
+      arm_target_debug_interface_type="ADIv5"
+      arm_target_loader_applicable_loaders="Flash"
+      arm_target_loader_default_loader="Flash"
+      arm_target_restrict_memory_accesses="Yes"
+      c_user_include_directories="$(TargetsDir)/TIVA/Include;$(TargetsDir)/CMSIS_3/CMSIS/Include"
+      debug_register_definition_file="$(TargetsDir)/TIVA/TM4C1294NCPDT.svd_Peripherals.xml"
+      linker_memory_map_file="$(TargetsDir)/TIVA/TM4C1294NCPDT_MemoryMap.xml"
+      linker_section_placement_file="$(StudioDir)/targets/Cortex_M/flash_placement.xml"
+      macros="FAMILY=TM4C129"
+      project_directory="es_user"
+      project_type="Executable"
+      property_groups_file_path="$(TargetsDir)/TIVA/propertyGroups.xml"
+      target_get_partname_script="GetPartName()"
+      target_match_partname_script="MatchPartName(&quot;$(Target)&quot;)"
+      target_reset_script="Reset()"
+      target_script_file="$(TargetsDir)/TIVA/TIVA_Target.js" />
+    <configuration
+      Name="Flash"
+      arm_target_flash_loader_file_path="$(TargetsDir)/TIVA/Release/Loader.elf"
+      target_reset_script="FLASHReset()" />
+    <folder Name="Source Files">
+      <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc" />
+      <file file_name="./../driverlib/ewarm/Exe/driverlib.a" />
+      <file file_name="./src/main.c" />
+      <file file_name="./src/startup_ewarm.c" />
+    </folder>
+    <folder Name="System Files">
+      <file file_name="$(StudioDir)/source/thumb_crt0.s" />
+      <file file_name="$(TargetsDir)/TIVA/TIVA_Startup.s" />
+      <file file_name="$(TargetsDir)/TIVA/Source/system_$(FAMILY).c" />
+    </folder>
+    <configuration
+      CMSIS_CORE="Yes"
+      Name="Debug"
+      c_preprocessor_definitions="ewarm;PART_TM4C1294NCPDT"
+      c_user_include_directories=";./../../..;./..;./../inc;./../driverlib" />
+    <configuration Name="Release" c_preprocessor_definitions="NDEBUG" />
+  </project>
+  <project Name="grlib">
+    <configuration
+      CMSIS_CORE="Yes"
+      Name="Common"
+      arm_core_type="Cortex-M4"
+      build_output_file_name="Debug/Exe/grlib.a"
+      c_preprocessor_definitions="ewarm"
+      c_user_include_directories=";./.."
+      project_directory="grlib"
+      project_type="Library" />
+    <folder Name="Documentation">
+      <file file_name="./readme.txt" />
+    </folder>
+    <folder Name="Source">
+      <file file_name="./canvas.c" />
+      <file file_name="./charmap.c" />
+      <file file_name="./checkbox.c" />
+      <file file_name="./circle.c" />
+      <file file_name="./container.c" />
+      <file file_name="./context.c" />
+      <file file_name="./fonts/fontcm12.c" />
+      <file file_name="./fonts/fontcm12b.c" />
+      <file file_name="./fonts/fontcm12i.c" />
+      <file file_name="./fonts/fontcm14.c" />
+      <file file_name="./fonts/fontcm14b.c" />
+      <file file_name="./fonts/fontcm14i.c" />
+      <file file_name="./fonts/fontcm16.c" />
+      <file file_name="./fonts/fontcm16b.c" />
+      <file file_name="./fonts/fontcm16i.c" />
+      <file file_name="./fonts/fontcm18.c" />
+      <file file_name="./fonts/fontcm18b.c" />
+      <file file_name="./fonts/fontcm18i.c" />
+      <file file_name="./fonts/fontcm20.c" />
+      <file file_name="./fonts/fontcm20b.c" />
+      <file file_name="./fonts/fontcm20i.c" />
+      <file file_name="./fonts/fontcm22.c" />
+      <file file_name="./fonts/fontcm22b.c" />
+      <file file_name="./fonts/fontcm22i.c" />
+      <file file_name="./fonts/fontcm24.c" />
+      <file file_name="./fonts/fontcm24b.c" />
+      <file file_name="./fonts/fontcm24i.c" />
+      <file file_name="./fonts/fontcm26.c" />
+      <file file_name="./fonts/fontcm26b.c" />
+      <file file_name="./fonts/fontcm26i.c" />
+      <file file_name="./fonts/fontcm28.c" />
+      <file file_name="./fonts/fontcm28b.c" />
+      <file file_name="./fonts/fontcm28i.c" />
+      <file file_name="./fonts/fontcm30.c" />
+      <file file_name="./fonts/fontcm30b.c" />
+      <file file_name="./fonts/fontcm30i.c" />
+      <file file_name="./fonts/fontcm32.c" />
+      <file file_name="./fonts/fontcm32b.c" />
+      <file file_name="./fonts/fontcm32i.c" />
+      <file file_name="./fonts/fontcm34.c" />
+      <file file_name="./fonts/fontcm34b.c" />
+      <file file_name="./fonts/fontcm34i.c" />
+      <file file_name="./fonts/fontcm36.c" />
+      <file file_name="./fonts/fontcm36b.c" />
+      <file file_name="./fonts/fontcm36i.c" />
+      <file file_name="./fonts/fontcm38.c" />
+      <file file_name="./fonts/fontcm38b.c" />
+      <file file_name="./fonts/fontcm38i.c" />
+      <file file_name="./fonts/fontcm40.c" />
+      <file file_name="./fonts/fontcm40b.c" />
+      <file file_name="./fonts/fontcm40i.c" />
+      <file file_name="./fonts/fontcm42.c" />
+      <file file_name="./fonts/fontcm42b.c" />
+      <file file_name="./fonts/fontcm42i.c" />
+      <file file_name="./fonts/fontcm44.c" />
+      <file file_name="./fonts/fontcm44b.c" />
+      <file file_name="./fonts/fontcm44i.c" />
+      <file file_name="./fonts/fontcm46.c" />
+      <file file_name="./fonts/fontcm46b.c" />
+      <file file_name="./fonts/fontcm46i.c" />
+      <file file_name="./fonts/fontcm48.c" />
+      <file file_name="./fonts/fontcm48b.c" />
+      <file file_name="./fonts/fontcm48i.c" />
+      <file file_name="./fonts/fontcmsc12.c" />
+      <file file_name="./fonts/fontcmsc14.c" />
+      <file file_name="./fonts/fontcmsc16.c" />
+      <file file_name="./fonts/fontcmsc18.c" />
+      <file file_name="./fonts/fontcmsc20.c" />
+      <file file_name="./fonts/fontcmsc22.c" />
+      <file file_name="./fonts/fontcmsc24.c" />
+      <file file_name="./fonts/fontcmsc26.c" />
+      <file file_name="./fonts/fontcmsc28.c" />
+      <file file_name="./fonts/fontcmsc30.c" />
+      <file file_name="./fonts/fontcmsc32.c" />
+      <file file_name="./fonts/fontcmsc34.c" />
+      <file file_name="./fonts/fontcmsc36.c" />
+      <file file_name="./fonts/fontcmsc38.c" />
+      <file file_name="./fonts/fontcmsc40.c" />
+      <file file_name="./fonts/fontcmsc42.c" />
+      <file file_name="./fonts/fontcmsc44.c" />
+      <file file_name="./fonts/fontcmsc46.c" />
+      <file file_name="./fonts/fontcmsc48.c" />
+      <file file_name="./fonts/fontcmss12.c" />
+      <file file_name="./fonts/fontcmss12b.c" />
+      <file file_name="./fonts/fontcmss12i.c" />
+      <file file_name="./fonts/fontcmss14.c" />
+      <file file_name="./fonts/fontcmss14b.c" />
+      <file file_name="./fonts/fontcmss14i.c" />
+      <file file_name="./fonts/fontcmss16.c" />
+      <file file_name="./fonts/fontcmss16b.c" />
+      <file file_name="./fonts/fontcmss16i.c" />
+      <file file_name="./fonts/fontcmss18.c" />
+      <file file_name="./fonts/fontcmss18b.c" />
+      <file file_name="./fonts/fontcmss18i.c" />
+      <file file_name="./fonts/fontcmss20.c" />
+      <file file_name="./fonts/fontcmss20b.c" />
+      <file file_name="./fonts/fontcmss20i.c" />
+      <file file_name="./fonts/fontcmss22.c" />
+      <file file_name="./fonts/fontcmss22b.c" />
+      <file file_name="./fonts/fontcmss22i.c" />
+      <file file_name="./fonts/fontcmss24.c" />
+      <file file_name="./fonts/fontcmss24b.c" />
+      <file file_name="./fonts/fontcmss24i.c" />
+      <file file_name="./fonts/fontcmss26.c" />
+      <file file_name="./fonts/fontcmss26b.c" />
+      <file file_name="./fonts/fontcmss26i.c" />
+      <file file_name="./fonts/fontcmss28.c" />
+      <file file_name="./fonts/fontcmss28b.c" />
+      <file file_name="./fonts/fontcmss28i.c" />
+      <file file_name="./fonts/fontcmss30.c" />
+      <file file_name="./fonts/fontcmss30b.c" />
+      <file file_name="./fonts/fontcmss30i.c" />
+      <file file_name="./fonts/fontcmss32.c" />
+      <file file_name="./fonts/fontcmss32b.c" />
+      <file file_name="./fonts/fontcmss32i.c" />
+      <file file_name="./fonts/fontcmss34.c" />
+      <file file_name="./fonts/fontcmss34b.c" />
+      <file file_name="./fonts/fontcmss34i.c" />
+      <file file_name="./fonts/fontcmss36.c" />
+      <file file_name="./fonts/fontcmss36b.c" />
+      <file file_name="./fonts/fontcmss36i.c" />
+      <file file_name="./fonts/fontcmss38.c" />
+      <file file_name="./fonts/fontcmss38b.c" />
+      <file file_name="./fonts/fontcmss38i.c" />
+      <file file_name="./fonts/fontcmss40.c" />
+      <file file_name="./fonts/fontcmss40b.c" />
+      <file file_name="./fonts/fontcmss40i.c" />
+      <file file_name="./fonts/fontcmss42.c" />
+      <file file_name="./fonts/fontcmss42b.c" />
+      <file file_name="./fonts/fontcmss42i.c" />
+      <file file_name="./fonts/fontcmss44.c" />
+      <file file_name="./fonts/fontcmss44b.c" />
+      <file file_name="./fonts/fontcmss44i.c" />
+      <file file_name="./fonts/fontcmss46.c" />
+      <file file_name="./fonts/fontcmss46b.c" />
+      <file file_name="./fonts/fontcmss46i.c" />
+      <file file_name="./fonts/fontcmss48.c" />
+      <file file_name="./fonts/fontcmss48b.c" />
+      <file file_name="./fonts/fontcmss48i.c" />
+      <file file_name="./fonts/fontcmtt12.c" />
+      <file file_name="./fonts/fontcmtt14.c" />
+      <file file_name="./fonts/fontcmtt16.c" />
+      <file file_name="./fonts/fontcmtt18.c" />
+      <file file_name="./fonts/fontcmtt20.c" />
+      <file file_name="./fonts/fontcmtt22.c" />
+      <file file_name="./fonts/fontcmtt24.c" />
+      <file file_name="./fonts/fontcmtt26.c" />
+      <file file_name="./fonts/fontcmtt28.c" />
+      <file file_name="./fonts/fontcmtt30.c" />
+      <file file_name="./fonts/fontcmtt32.c" />
+      <file file_name="./fonts/fontcmtt34.c" />
+      <file file_name="./fonts/fontcmtt36.c" />
+      <file file_name="./fonts/fontcmtt38.c" />
+      <file file_name="./fonts/fontcmtt40.c" />
+      <file file_name="./fonts/fontcmtt42.c" />
+      <file file_name="./fonts/fontcmtt44.c" />
+      <file file_name="./fonts/fontcmtt46.c" />
+      <file file_name="./fonts/fontcmtt48.c" />
+      <file file_name="./fonts/fontfixed6x8.c" />
+      <file file_name="./image.c" />
+      <file file_name="./imgbutton.c" />
+      <file file_name="./keyboard.c" />
+      <file file_name="./line.c" />
+      <file file_name="./listbox.c" />
+      <file file_name="./offscr1bpp.c" />
+      <file file_name="./offscr4bpp.c" />
+      <file file_name="./offscr8bpp.c" />
+      <file file_name="./pushbutton.c" />
+      <file file_name="./radiobutton.c" />
+      <file file_name="./rectangle.c" />
+      <file file_name="./slider.c" />
+      <file file_name="./string.c" />
+      <file file_name="./widget.c" />
+    </folder>
+  </project>
+</solution>

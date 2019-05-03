@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "pin_map.h": "c",
+        "tm4c1294ncpdt.h": "c",
+        "math.h": "c"
+    }
+}

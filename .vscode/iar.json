@@ -1,0 +1,7 @@
+{
+    "version": 1,
+    "path": "C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.0\\",
+    "project": "E:\\UTFPR\\9º Período\\Embarcados\\Projetos\\Lab0_V1.0\\Lab0FrequencimetroFoto\\Tiva_IAR8",
+    "config": "Debug",
+    "parallel" : true
+}

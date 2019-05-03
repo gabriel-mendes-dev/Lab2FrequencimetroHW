@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<settings>
+    <LMIFTDIDriver>
+        <LMIFTDIserialNo>0F00923F</LMIFTDIserialNo>
+        <LMIFTDIfoundProbes />
+    </LMIFTDIDriver>
+    <DebugChecksum>
+        <Checksum>3503768565</Checksum>
+    </DebugChecksum>
+    <Exceptions>
+        <StopOnUncaught>_ 0</StopOnUncaught>
+        <StopOnThrow>_ 0</StopOnThrow>
+    </Exceptions>
+    <Stack>
+        <FillEnabled>0</FillEnabled>
+        <OverflowWarningsEnabled>1</OverflowWarningsEnabled>
+        <WarningThreshold>90</WarningThreshold>
+        <SpWarningsEnabled>1</SpWarningsEnabled>
+        <WarnLogOnly>1</WarnLogOnly>
+        <UseTrigger>1</UseTrigger>
+        <TriggerName>main</TriggerName>
+        <LimitSize>0</LimitSize>
+        <ByteLimit>50</ByteLimit>
+    </Stack>
+    <CallStack>
+        <ShowArgs>0</ShowArgs>
+    </CallStack>
+    <Disassembly>
+        <MixedMode>1</MixedMode>
+    </Disassembly>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
+    <CallStackLog>
+        <Enabled>0</Enabled>
+    </CallStackLog>
+    <CallStackStripe>
+        <ShowTiming>1</ShowTiming>
+    </CallStackStripe>
+    <LogFile>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+        <Category>_ 0</Category>
+    </LogFile>
+    <DisassembleMode>
+        <mode>0</mode>
+    </DisassembleMode>
+    <Breakpoints>
+        <Bp0>_ "STD_CODE" "{$PROJ_DIR$\src}.2496.5" 0 0 0 0 "" 0 ""</Bp0>
+        <Bp1>_ "STD_CODE" "{$PROJ_DIR$\src\main.c}.197.1" 0 0 0 0 "" 0 ""</Bp1>
+        <Bp2>_ "STD_CODE" "{$PROJ_DIR$\src\Ordenacao.c}.53.1" 1 0 0 0 "" 0 ""</Bp2>
+        <Count>3</Count>
+    </Breakpoints>
+    <Aliases>
+        <A0>_ "E:\UTFPR\9º Período\Embarcados\Lab0\es_simples\src\main.c" "C:\Users\geo_s\Documents\Drive - geovanaslla\9 Embarcados\LAB0\Lab02\Lab0\es_simples\src\main.c"</A0>
+        <A1>_ "E:\UTFPR\9º Período\Embarcados\Tiva_IAR8\driverlib\gpio.c" "C:\Users\geo_s\Documents\Drive - geovanaslla\9 Embarcados\LAB0\Lab02\Lab0\driverlib\gpio.c"</A1>
+        <A2>_ "E:\UTFPR\9º Período\Embarcados\Tiva_IAR8\driverlib\sysctl.c" "C:\Users\geo_s\Documents\Drive - geovanaslla\9 Embarcados\LAB0\Lab02\Lab0\driverlib\sysctl.c"</A2>
+        <A3>_ "E:\UTFPR\9º Período\Embarcados\Tiva_IAR8\driverlib\uart.c" "C:\Users\geo_s\Documents\Drive - geovanaslla\9 Embarcados\LAB0\Lab02\Lab0\driverlib\uart.c"</A3>
+        <Count>4</Count>
+        <SuppressDialog>0</SuppressDialog>
+    </Aliases>
+</settings>

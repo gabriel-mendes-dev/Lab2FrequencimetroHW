@@ -1,0 +1,13 @@
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\bin\armproc.dll" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\bin\armsim2.dll" 
+
+"C:\Users\geo_s\Documents\Drive - geovanaslla\9 Embarcados\LAB0\Lab02\Lab0 - backup\driverlib\ewarm\Exe\driverlib.out" 
+
+--plugin="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\bin\armbat.dll" 
+
+--device_macro="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\config\debugger\TexasInstruments\TM4C129.dmac" 
+
+
+
+
