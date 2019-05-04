@@ -1,0 +1,12 @@
+
+*.o
+*.out
+*.sim
+*.map
+*.xcl
+*.linf
+*.sim
+*.pbi
+*.rar
+*.bat
+*.sim

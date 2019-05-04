@@ -14,6 +14,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "inc/hw_gpio.h"
+#include "inc/hw_timer.h"
 
 #include "driverlib/sysctl.h" // driverlib
 #include "driverlib/gpio.h"
@@ -57,6 +58,8 @@
 
 #define JANELA_ESCALA_KILOHERTZ 1       //Em milissegundos
 #define JANELA_ESCALA_HERTZ 2000        //Em milissegundos
+
+#define TimerValueSet(u1Base, ulTimer, ulValue)         HWREG((u1Base) + ((ulTimer)==TIMER_A ? TIMER_O_TAV : TIMER_O_TBV)) = (ulValue)
 
 uint16_t janela = JANELA_ESCALA_HERTZ;
 bool leitura_realizada = false;
@@ -103,8 +106,8 @@ void main(void)
   while(!SysCtlPeripheralReady(WAVE_INPUT_PERIPHERAL)); // Aguarda final da habilita��o
     
   //GPIOPinTypeGPIOInput(WAVE_INPUT_PORT, WAVE_INPUT_PIN); // Entrada da onda como entrada
-  GPIOPinTypeTimer(WAVE_INPUT_PORT, WAVE_INPUT_PIN);
   GPIOPinConfigure(GPIO_PB2_T5CCP0);
+  GPIOPinTypeTimer(WAVE_INPUT_PORT, WAVE_INPUT_PIN);
   GPIOPadConfigSet(WAVE_INPUT_PORT, WAVE_INPUT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);//weak pull-up
   
   //GPIO bot�o
@@ -118,13 +121,19 @@ void main(void)
  
   //Configuração do Timer 5 - linkado com PB2
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
-  TimerConfigure(TIMER5_BASE, TIMER_CFG_ONE_SHOT_UP);
-  TimerControlEvent(TIMER5_BASE, TIMER_A, TIMER_EVENT_BOTH_EDGES);
-  TimerLoadSet(TIMER5_BASE, TIMER_A, 0);
+  TimerConfigure(TIMER5_BASE, TIMER_CFG_SPLIT_PAIR|TIMER_CFG_A_CAP_COUNT_UP);
+  TimerControlEvent(TIMER5_BASE, TIMER_A, TIMER_EVENT_POS_EDGE);
+//  TimerMatchSet(TIMER5_BASE,TIMER_A,0xFFFF);
+  TimerPrescaleSet(TIMER5_BASE,TIMER_A,1);
+//  TimerPrescaleMatchSet(TIMER5_BASE,TIMER_A,0xFF);
+    //TimerUpdateMode(TIMER5_BASE,TIMER_A,TIMER_UP_LOAD_IMMEDIATE);
+  TimerLoadSet(TIMER5_BASE, TIMER_A, 8);
   TimerEnable(TIMER5_BASE, TIMER_A);
+  uint32_t contagem = TimerValueGet(TIMER5_BASE, TIMER_A);
   //TimerMatchSet
 
   //Systick Configuration
+  //SysTickDisable();
   setJanela(janela);
   SysTickEnable();
   SysTickIntEnable();
@@ -135,18 +144,20 @@ void main(void)
   IntMasterEnable();//habilita todas as interrup��es
   
   while(1)
-  { 
-    
+  {     
     while(dados_lidos < N_DADOS)
     {
       if(leitura_realizada)
       {
           leitura_realizada = false;
-          uint32_t contagem = TimerValueGet(TIMER5_BASE, TIMER_A);
-          dadosFrequencia[dados_lidos++] = (1000.0 * ((float)TimerValueGet(TIMER5_BASE, TIMER_A)/2.0)/(float)janela);
+          contagem = TimerValueGet(TIMER5_BASE, TIMER_A);//tirar
+          
+          dadosFrequencia[dados_lidos++] = (1000.0 * (float)TimerValueGet(TIMER5_BASE, TIMER_A)/(float)janela);
+          
           TimerDisable(TIMER5_BASE, TIMER_A);
-          //TimerLoadSet(TIMER5_BASE, TIMER_A, 0);
+          TimerValueSet(TIMER5_BASE,TIMER_A,0);
           TimerEnable(TIMER5_BASE, TIMER_A);
+          
           SysTickEnable();
       }
     }           
@@ -182,7 +193,8 @@ void uart_puts(char * s) {
 
 //Callback interrupção do botão
 void PortJIntHandler(void)
-{
+{    
+  SysTickDisable();
   if(janela == JANELA_ESCALA_HERTZ)
   {
     setJanela(JANELA_ESCALA_KILOHERTZ);
@@ -193,7 +205,7 @@ void PortJIntHandler(void)
   }
   dados_lidos = 0;
   TimerDisable(TIMER5_BASE, TIMER_A);
-  TimerLoadSet(TIMER5_BASE, TIMER_A, 0);
+  TimerValueSet(TIMER5_BASE,TIMER_A,0);
   TimerEnable(TIMER5_BASE, TIMER_A);
   SysTickEnable();
 }
@@ -206,6 +218,5 @@ void SysTick_Handler(void){
 void setJanela(uint16_t janela_ms)
 {
     janela = janela_ms;
-    SysTickDisable();
     SysTickPeriodSet((PLL_FREQ/1000) * janela); // 
 }
