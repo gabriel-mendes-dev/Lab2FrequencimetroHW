@@ -49,7 +49,6 @@
 #define SCALE_CHANGE_BUTTON_PORT        GPIO_PORTJ_BASE
 #define SCALE_CHANGE_BUTTON_PIN         GPIO_PIN_0
 #define SCALE_CHANGE_INT_PIN            GPIO_INT_PIN_0
-#define SCALE_CHANGE_REG                HWREG(SCALE_CHANGE_BUTTON_PORT + (0x00000000+(SCALE_CHANGE_BUTTON_PIN << 2)))
 
 //uart
 #define uart_putch(ch) UARTCharPut(UART0_BASE, ch)
@@ -59,15 +58,19 @@
 #define JANELA_ESCALA_KILOHERTZ 1       //Em milissegundos
 #define JANELA_ESCALA_HERTZ 2000        //Em milissegundos
 
-bool escala = 0;
+uint16_t janela = JANELA_ESCALA_HERTZ;
 bool leitura_realizada = false;
+uint32_t dados_lidos = 0;
+float dadosFrequencia[N_DADOS];
+
 //prot�tipos
 void            uart_puts(char * s);
 void            PortJIntHandler(void);
-uint32_t        getBordas();
 void            printFrequencia(float frequencia);
 void            SysTick_Handler(void);
-void            setJanela(uint32_t janela_ms);
+void            setJanela(uint16_t janela_ms);
+
+
 void main(void)
 {
  
@@ -80,10 +83,8 @@ void main(void)
 
   //Variáveis locais do main
   float frequencia = 0.0;
-  float dados[N_DADOS];
   float frequenciaMedia = 0.0, frequenciaMediana = 0.0, frequenciaModa = 0.0, desvioPadrao = 0.0;
-  uint8_t *vetor_estados = (uint8_t *) malloc(N*sizeof(uint8_t));//Alocação dinâmica utilizada somente 
-                                                                 //com o intuito de alocar na heap
+  
 
   //Inicializa Uart
   SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
@@ -103,7 +104,7 @@ void main(void)
     
   //GPIOPinTypeGPIOInput(WAVE_INPUT_PORT, WAVE_INPUT_PIN); // Entrada da onda como entrada
   GPIOPinTypeTimer(WAVE_INPUT_PORT, WAVE_INPUT_PIN);
-  GPIOPinConfigure(GPIO_PB2_T3CCP0);
+  GPIOPinConfigure(GPIO_PB2_T5CCP0);
   GPIOPadConfigSet(WAVE_INPUT_PORT, WAVE_INPUT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);//weak pull-up
   
   //GPIO bot�o
@@ -115,93 +116,51 @@ void main(void)
   GPIOIntTypeSet(SCALE_CHANGE_BUTTON_PORT, SCALE_CHANGE_BUTTON_PIN, GPIO_LOW_LEVEL); // push-button SW1
   GPIOIntEnable(SCALE_CHANGE_BUTTON_PORT, SCALE_CHANGE_INT_PIN);
  
-  //Configuração do Timer 3 - linkado com PB2
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);
-  TimerConfigure(TIMER3_BASE, TIMER_CFG_ONE_SHOT_UP);
-  TimerControlEvent(TIMER0_BASE, TIMER_BOTH, TIMER_EVENT_BOTH_EDGES);
-  TimerLoadSet(TIMER0_BASE, TIMER_BOTH, 0);
-  TimerEnable(TIMER0_BASE, TIMER_BOTH);
+  //Configuração do Timer 5 - linkado com PB2
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
+  TimerConfigure(TIMER5_BASE, TIMER_CFG_ONE_SHOT_UP);
+  TimerControlEvent(TIMER5_BASE, TIMER_A, TIMER_EVENT_BOTH_EDGES);
+  TimerLoadSet(TIMER5_BASE, TIMER_A, 0);
+  TimerEnable(TIMER5_BASE, TIMER_A);
   //TimerMatchSet
 
   //Systick Configuration
+  setJanela(janela);
   SysTickEnable();
-  setJanela(JANELA_ESCALA_KILOHERTZ);
   SysTickIntEnable();
+
 
   //Interrup��es
   IntEnable(INT_GPIOJ);//habilita interrup��o do portJ - bot�o de escala
   IntMasterEnable();//habilita todas as interrup��es
-    
-  if(vetor_estados == NULL)
-  {
-      char aux_s[32];
-      sprintf(aux_s,"Erro malloc\n");
-      uart_puts(aux_s);
-      while(1);      
-  }
   
   while(1)
-  {            
-    if(escala == 0)    
+  { 
+    
+    while(dados_lidos < N_DADOS)
     {
-      for(uint16_t i = 0; i < N_DADOS; i++)
+      if(leitura_realizada)
       {
-        n_loop(vetor_estados,WAVE_INPUT_END);     
-        
-        //C�lculo da frequ�ncia     
-        dados[i] = (float)((float)getBordas(vetor_estados))*PLL_FREQ/(float)(5 * N);
+          leitura_realizada = false;
+          uint32_t contagem = TimerValueGet(TIMER5_BASE, TIMER_A);
+          dadosFrequencia[dados_lidos++] = (1000.0 * ((float)TimerValueGet(TIMER5_BASE, TIMER_A)/2.0)/(float)janela);
+          TimerDisable(TIMER5_BASE, TIMER_A);
+          //TimerLoadSet(TIMER5_BASE, TIMER_A, 0);
+          TimerEnable(TIMER5_BASE, TIMER_A);
+          SysTickEnable();
       }
-    }
-    else
-    {
-      for(uint16_t i = 0; i < N_DADOS; i++)
-      {
-        asm("push {r1,r2,r4}");
-        asm("mov r1, %[var]\n" ::[var] "r" (WAVE_INPUT_END)); 
-        asm("mov r2, %[var]\n" ::[var] "r" (vetor_estados-1)); 
-      
-        //loop dura 2 segundos para PLL = 24Mhz
-        //(2 segundos/16000 amostras) * 24MHz = 3000 ciclos
-        for(uint32_t i = 0; i < N; i++)//usa R6 ~5ciclos
-        {
-          asm("LDR.W R4, [R1]"); //2 ciclos
-          asm("STRB R4, [R2,#1]!");//3 ciclos
-          SysCtlDelay(996);//usa R0 ~ (3000 - 10)/3
-        }
-        
-        asm("pop {r1,r2,r4}");
-        
-        //C�lculo da frequ�ncia 
-        dados[i] = (float)(getBordas(vetor_estados)/2.0)*PLL_FREQ/(float)(3000 * N);
-      }
-    }
-
-    frequenciaMedia = Media(dados, N_DADOS);
-    frequenciaMediana = Mediana(dados, N_DADOS);
-    frequenciaModa = Moda(dados, N_DADOS);
-    desvioPadrao = DesvioPadrao(dados, N_DADOS); 
+    }           
+    dados_lidos = 0;
+    frequenciaMedia = Media(dadosFrequencia, N_DADOS);
+    frequenciaMediana = Mediana(dadosFrequencia, N_DADOS);
+    frequenciaModa = Moda(dadosFrequencia, N_DADOS);
+    desvioPadrao = DesvioPadrao(dadosFrequencia, N_DADOS); 
     frequencia = frequenciaMedia;
     
     printFrequencia(frequencia);
  
   } // while
 } // main
-
-uint32_t getBordas(uint8_t *vetor_estados)
-{
-      uint32_t contagem_bordas = 0;
-      uint8_t  estado_anterior = *(vetor_estados);
-      for(uint32_t i = 0; i < N; i++)
-      {
-        if(estado_anterior != *(vetor_estados+i))//andar 1 byte
-        {
-          contagem_bordas++;        
-          estado_anterior = *(vetor_estados+i);
-        }
-      }
-      
-      return contagem_bordas;
-}
 
 void printFrequencia(float frequencia)
 {
@@ -221,10 +180,22 @@ void uart_puts(char * s) {
     }
 }
 
-//Callbeack interrup??o do bot?o
+//Callback interrupção do botão
 void PortJIntHandler(void)
 {
-  escala = !escala;
+  if(janela == JANELA_ESCALA_HERTZ)
+  {
+    setJanela(JANELA_ESCALA_KILOHERTZ);
+  }
+  else
+  {
+    setJanela(JANELA_ESCALA_HERTZ);
+  }
+  dados_lidos = 0;
+  TimerDisable(TIMER5_BASE, TIMER_A);
+  TimerLoadSet(TIMER5_BASE, TIMER_A, 0);
+  TimerEnable(TIMER5_BASE, TIMER_A);
+  SysTickEnable();
 }
 
 void SysTick_Handler(void){
@@ -232,7 +203,9 @@ void SysTick_Handler(void){
     SysTickDisable();
 } // SysTick_Handler
 
-void setJanela(uint32_t janela_ms)
+void setJanela(uint16_t janela_ms)
 {
-    SysTickPeriodSet((PLL_FREQ/1000) * janela_ms); // 
+    janela = janela_ms;
+    SysTickDisable();
+    SysTickPeriodSet((PLL_FREQ/1000) * janela); // 
 }
