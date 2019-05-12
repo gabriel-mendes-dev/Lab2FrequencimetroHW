@@ -54,17 +54,17 @@
 //uart
 #define uart_putch(ch) UARTCharPut(UART0_BASE, ch)
 
-#define N_DADOS 50
+#define N_DADOS 5
 
 #define JANELA_ESCALA_KILOHERTZ 1       //Em milissegundos
 #define JANELA_ESCALA_HERTZ 2000        //Em milissegundos
 
 #define TimerValueSet(u1Base, ulTimer, ulValue)         HWREG((u1Base) + ((ulTimer)==TIMER_A ? TIMER_O_TAV : TIMER_O_TBV)) = (ulValue)
 
-uint16_t janela = JANELA_ESCALA_HERTZ;
+uint16_t janela = JANELA_ESCALA_KILOHERTZ;
 bool leitura_realizada = false;
 uint32_t dados_lidos = 0;
-float dadosFrequencia[N_DADOS];
+float dadosFrequencia[N_DADOS+1];
 
 //prot�tipos
 void            uart_puts(char * s);
@@ -127,8 +127,8 @@ void main(void)
   TimerPrescaleSet(TIMER5_BASE,TIMER_A,1);
 //  TimerPrescaleMatchSet(TIMER5_BASE,TIMER_A,0xFF);
     //TimerUpdateMode(TIMER5_BASE,TIMER_A,TIMER_UP_LOAD_IMMEDIATE);
-  TimerLoadSet(TIMER5_BASE, TIMER_A, 8);
-  TimerEnable(TIMER5_BASE, TIMER_A);
+  //TimerLoadSet(TIMER5_BASE, TIMER_A, 8);
+ // TimerEnable(TIMER5_BASE, TIMER_A);
   uint32_t contagem = TimerValueGet(TIMER5_BASE, TIMER_A);
   //TimerMatchSet
 
@@ -145,7 +145,14 @@ void main(void)
   
   while(1)
   {     
-    while(dados_lidos < N_DADOS)
+    dados_lidos = 0;
+    TimerValueSet(TIMER5_BASE,TIMER_A,0);
+ //   SysTickDisable();
+   // leitura_realizada = false;
+  //  setJanela(janela);
+    TimerEnable(TIMER5_BASE, TIMER_A);
+   // SysTickEnable();
+    while(dados_lidos < (N_DADOS+1))
     {
       if(leitura_realizada)
       {
@@ -154,31 +161,43 @@ void main(void)
           
           dadosFrequencia[dados_lidos++] = (1000.0 * (float)TimerValueGet(TIMER5_BASE, TIMER_A)/(float)janela);
           
-          TimerDisable(TIMER5_BASE, TIMER_A);
+        //  TimerDisable(TIMER5_BASE, TIMER_A);
           TimerValueSet(TIMER5_BASE,TIMER_A,0);
           TimerEnable(TIMER5_BASE, TIMER_A);
-          
           SysTickEnable();
       }
     }           
-    dados_lidos = 0;
-    frequenciaMedia = Media(dadosFrequencia, N_DADOS);
-    frequenciaMediana = Mediana(dadosFrequencia, N_DADOS);
-    frequenciaModa = Moda(dadosFrequencia, N_DADOS);
-    desvioPadrao = DesvioPadrao(dadosFrequencia, N_DADOS); 
-    frequencia = frequenciaMedia;
     
+    
+    frequenciaMedia = Media((dadosFrequencia+1), N_DADOS);
+    frequenciaMediana = Mediana((dadosFrequencia+1), N_DADOS);
+    frequenciaModa = Moda((dadosFrequencia+1), N_DADOS);
+    //desvioPadrao = DesvioPadrao((dadosFrequencia+1), N_DADOS); 
+   // frequencia = frequenciaMedia;
+   // frequencia = frequenciaMediana;
+     frequencia = frequenciaModa;
+   // uint64_t teste = frequencia*1000;
     printFrequencia(frequencia);
- 
+   // printf("\n");
+/*    
+    printFrequencia(frequenciaMedia);
+    printf("\n");
+    printFrequencia(frequenciaMediana);
+    printf("\n");
+    printFrequencia(frequenciaModa);
+    printf("\n");
+    printFrequencia(desvioPadrao);
+    printf("\n");
+ */
   } // while
 } // main
 
 void printFrequencia(float frequencia)
 {
-  uint16_t f_aux = 0;//formatar string 
+  uint32_t f_aux = 0;//formatar string 
   char aux_s[32];
   
-  f_aux = ((uint16_t)(frequencia*1000)%1000);//todo
+  f_aux = ((uint32_t)(frequencia*1000)%1000);//todo
   sprintf(aux_s,"frequencia: %d.%d",(int)frequencia,f_aux);
   uart_puts(aux_s);
   
@@ -203,7 +222,7 @@ void PortJIntHandler(void)
   {
     setJanela(JANELA_ESCALA_HERTZ);
   }
-  dados_lidos = 0;
+  dados_lidos = 0;                      //resetar contagem para estatística
   TimerDisable(TIMER5_BASE, TIMER_A);
   TimerValueSet(TIMER5_BASE,TIMER_A,0);
   TimerEnable(TIMER5_BASE, TIMER_A);
@@ -212,6 +231,7 @@ void PortJIntHandler(void)
 
 void SysTick_Handler(void){
     leitura_realizada = true;
+    TimerDisable(TIMER5_BASE, TIMER_A);
     SysTickDisable();
 } // SysTick_Handler
 

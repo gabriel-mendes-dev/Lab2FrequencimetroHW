@@ -6,18 +6,20 @@
 float Media(float * dados, uint32_t n_dados)
 {
     uint32_t i;
-    float soma;
+    float soma = 0.0;
     for(i = 0; i < n_dados; i++)
     {
         soma += dados[i];
     }
-    return soma/((float)n_dados);
+    uint64_t t = soma/n_dados;
+    return (float)(soma/((float)n_dados));
 }
 
 float Mediana(float * dados, uint32_t n_dados)
 {
     insertionSort(dados, n_dados);
-    return (n_dados%2 == 0)? ((dados[n_dados/2 -1] + dados[n_dados/2])/2) : dados[n_dados/2];
+  //  uint64_t help = (float)((n_dados%2 == 0)? ((dados[n_dados/2 -1] + dados[n_dados/2])/2) : dados[n_dados/2]);
+    return (float)((n_dados%2 == 0)? ((dados[n_dados/2 -1] + dados[n_dados/2])/2) : dados[n_dados/2]);
 }
 
 float Moda(float * dados, uint32_t n_dados)
