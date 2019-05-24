@@ -90,6 +90,21 @@ void timerInit()
   //TimerMatchSet
 }
 
+
+void systickInit(uint16_t ms)
+{  
+  //Systick Configuration
+  SysTickPeriodSet((ui32SysClock/1000)*ms);//1ms
+  SysTickEnable();
+  SysTickIntEnable();
+}
+
+void interruptInit()
+{
+  IntEnable(INT_GPIOJ);//habilita interrup??o do portJ - bot?o de escala
+  IntMasterEnable();//habilita todas as interrup??es
+}
+
 void uart_puts(char * s) 
 {
     while (*s != 0) {

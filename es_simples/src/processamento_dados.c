@@ -56,5 +56,7 @@ float DesvioPadrao(float * dados, uint32_t n_dados)
     {
         SDQ += pow(dados[i] - media, 2); 
     }
+    uint64_t teste = SDQ;
+    uint64_t teste_dec = (uint64_t)(SDQ*1000)%1000;
     return sqrt(SDQ)/((float)n_dados - 1.0);
 }

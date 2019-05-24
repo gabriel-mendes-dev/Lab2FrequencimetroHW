@@ -31,6 +31,9 @@ void clockInit(uint32_t PLL_FREQ);
 void uartInit();
 void GPIOInit();
 void timerInit();
+void systickInit(uint16_t ms);
+void interruptInit();
 void uart_puts(char * s);
+
 
 #endif

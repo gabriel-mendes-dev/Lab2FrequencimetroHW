@@ -5,6 +5,7 @@
 //S12
 /****************************************/
 #include "device_driver.h"
+#include "processamento_dados.h"
 
 //#define PLL_FREQ_24   
 
@@ -20,128 +21,133 @@
 #endif
 
 
-#define N_DADOS 5
+#define N_DADOS 10
 
 #define JANELA_ESCALA_KILOHERTZ 1       //Em milissegundos
 #define JANELA_ESCALA_HERTZ 1000        //Em milissegundos
 
 
-uint16_t janela = JANELA_ESCALA_HERTZ;
+uint16_t janela = JANELA_ESCALA_KILOHERTZ;
 uint32_t contador_janela_hertz = 0;
 bool leitura_realizada = false;
 uint32_t dados_lidos = 0;
 float dadosFrequencia[N_DADOS+1];
+uint32_t contagem = 0;
 
 //protótipos
-void            PortJIntHandler(void);  //callback do botão
-void            SysTick_Handler(void);  //callback do systick
-void            setJanela(uint16_t janela_ms);
+void PortJIntHandler(void);  //callback do botão
+void SysTick_Handler(void);  //callback do systick
 
-void            printFrequencia(float frequencia);
+void printFrequencia(float frequencia);
+void printDesvio(float desvio);
 
 void main(void)
 {
- 
-     clockInit(PLL_FREQ);
-     
-     uartInit();
-
-     GPIOInit();
-
-     timerInit();
-
-  //Variáveis locais do main
+   //Variáveis locais do main
   float frequencia = 0.0;
   float frequenciaMedia = 0.0, frequenciaMediana = 0.0, frequenciaModa = 0.0, desvioPadrao = 0.0;
+  
+   clockInit(PLL_FREQ);
+   
+   uartInit();
 
-  //Systick Configuration
-  //SysTickDisable();
- // setJanela(janela);
-  SysTickPeriodSet((PLL_FREQ/1000));//1ms
-  SysTickEnable();
-  SysTickIntEnable();
+   GPIOInit();
 
+   timerInit();
+   TimerEnable(TIMER5_BASE, TIMER_A);
 
-  //Interrupções
-  IntEnable(INT_GPIOJ);//habilita interrup��o do portJ - bot�o de escala
-  IntMasterEnable();//habilita todas as interrup��es
+   systickInit(1);
+
+   interruptInit();
   
   while(1)
   {     
     dados_lidos = 0;
     TimerValueSet(TIMER5_BASE,TIMER_A,0);
- //   SysTickDisable();
-   // leitura_realizada = false;
-  //  setJanela(janela);
-    TimerEnable(TIMER5_BASE, TIMER_A);
-   // SysTickEnable();
+    
+
     while(dados_lidos < (N_DADOS+1))
     {
       if(leitura_realizada)
       {
-          leitura_realizada = false;
-         uint32_t contagem = TimerValueGet(TIMER5_BASE, TIMER_A);//tirar
-          
-          dadosFrequencia[dados_lidos++] = (1000.0 * (float)TimerValueGet(TIMER5_BASE, TIMER_A)/(float)janela);
-         // dadosFrequencia[dados_lidos++]=(float)TimerValueGet(TIMER5_BASE, TIMER_A);
-        //  TimerDisable(TIMER5_BASE, TIMER_A);
-          TimerValueSet(TIMER5_BASE,TIMER_A,0);
-          TimerEnable(TIMER5_BASE, TIMER_A);
-          SysTickEnable();
+        leitura_realizada = false;
+        
+         if(janela==JANELA_ESCALA_KILOHERTZ)
+         {  SysTickDisable();             
+            dadosFrequencia[dados_lidos++] = (1000.0 * (float)contagem/((float)janela));        
+            
+            
+            TimerValueSet(TIMER5_BASE,TIMER_A,0);
+            SysTickEnable();
+         }
+         else
+         {
+           if(contador_janela_hertz>=JANELA_ESCALA_HERTZ)
+           {
+             dadosFrequencia[dados_lidos++] = (1000.0 * (float)contagem/((float)janela));
+             contador_janela_hertz = 0;
+             TimerValueSet(TIMER5_BASE,TIMER_A,0);
+           }
+           contador_janela_hertz++;
+         }        
       }
     }           
     
     
+    //Descarta a primeira medida
     frequenciaMedia = Media((dadosFrequencia+1), N_DADOS);
     frequenciaMediana = Mediana((dadosFrequencia+1), N_DADOS);
     frequenciaModa = Moda((dadosFrequencia+1), N_DADOS);
-    //desvioPadrao = DesvioPadrao((dadosFrequencia+1), N_DADOS); 
-   // frequencia = frequenciaMedia;
-   // frequencia = frequenciaMediana;
-     //frequencia = frequenciaModa;
-     frequencia =  dadosFrequencia[1]/2;
-   // uint64_t teste = frequencia*1000;
+    desvioPadrao = DesvioPadrao((dadosFrequencia+1), N_DADOS); 
     
-    // uart_puts("Frequencia: ");
-    printFrequencia(frequencia);
-   // uart_puts("\n");
-   // printf("\n");
-/*    
-    printFrequencia(frequenciaMedia);
-    printf("\n");
-    printFrequencia(frequenciaMediana);
-    printf("\n");
-    printFrequencia(frequenciaModa);
-    printf("\n");
-    printFrequencia(desvioPadrao);
-    printf("\n");
- */
+    //frequencia = frequenciaMedia;
+    frequencia = frequenciaMediana;
+     //frequencia = frequenciaModa;
+    if(janela == JANELA_ESCALA_KILOHERTZ)
+    {      
+      printFrequencia(frequencia/2.0);//borda de subida e descida   
+       SysCtlDelay(PLL_FREQ);
+    }
+    else
+      printFrequencia(frequencia/2.0);//borda de subida e descida   
+   // printDesvio(desvioPadrao);
+
   } // while
 } // main
 
 void printFrequencia(float frequencia)
 {
-  uint64_t f_aux = 0;//formatar string 
+  uint32_t f_aux = 0;//formatar string 
   char aux_s[32];
   
   if(janela == JANELA_ESCALA_HERTZ)
   {
-    f_aux = ((uint64_t)(frequencia*1000)%1000);//todo
-    sprintf(aux_s,"frequencia: %d.%d[Hz]",(int)frequencia,f_aux);
+    f_aux =(uint32_t) ((uint64_t)(frequencia*1000)%1000);//todo
+    sprintf(aux_s,"\nFrequencia: %u,%u[Hz]",(uint32_t)frequencia,f_aux);
   }
   else //kHz
   {
-    f_aux = ((uint64_t)(frequencia*1000000)%1000);//todo
-    sprintf(aux_s,"%d.%d[kHz]",(int)(frequencia/1000),f_aux);
+    f_aux = ((uint64_t)(frequencia*1000000)%1000);//todo    
+    sprintf(aux_s,"\nFrequencia: %u,%u[kHz]",(uint32_t)(frequencia/1000),f_aux);
   }
   uart_puts(aux_s);
-  
 }
 
+void printDesvio(float desvio)
+{
+  uint32_t f_aux = 0;//formatar string 
+  char aux_s[32];
+ 
+    f_aux =(uint32_t) ((uint64_t)(desvio*1000)%1000);//todo
+    sprintf(aux_s,"Desvio: %u,%u[Hz]",(uint32_t)desvio,f_aux);
+  uart_puts(aux_s);
+}
 //Callback interrupção do botão
 void PortJIntHandler(void)
 {    
   SysTickDisable();
+  //troca janela
+  
   if(janela == JANELA_ESCALA_HERTZ)
   {
     janela = JANELA_ESCALA_KILOHERTZ;
@@ -151,38 +157,19 @@ void PortJIntHandler(void)
     contador_janela_hertz = 0;
     janela = JANELA_ESCALA_HERTZ;
   }
+  
   dados_lidos = 0;                      //resetar contagem para estatística
-  TimerDisable(TIMER5_BASE, TIMER_A);
+//  TimerDisable(TIMER5_BASE, TIMER_A);   //reseta timer
   TimerValueSet(TIMER5_BASE,TIMER_A,0);
-  TimerEnable(TIMER5_BASE, TIMER_A);
+  //TimerEnable(TIMER5_BASE, TIMER_A);
+  
   SysTickEnable();
 }
 
-void SysTick_Handler(void){
-  if(janela == JANELA_ESCALA_KILOHERTZ)
-  {
-    TimerDisable(TIMER5_BASE, TIMER_A);
-    SysTickDisable();
-    leitura_realizada = true;
-  }
-  else
-  {
-    if(contador_janela_hertz>=JANELA_ESCALA_HERTZ)
-    {
-      TimerDisable(TIMER5_BASE, TIMER_A);
-      SysTickDisable();
-      contador_janela_hertz = 0;
-      leitura_realizada = true;  
-    }
-    else
-      contador_janela_hertz++;
-      
-  }
-    
-} // SysTick_Handler
-
-//void setJanela(uint16_t janela_ms)
-//{
-//    janela = janela_ms;
-//     // 
-//}
+//Callback do systick
+void SysTick_Handler(void)
+{  
+//  SysTickDisable();   
+  contagem = TimerValueGet(TIMER5_BASE, TIMER_A); 
+  leitura_realizada = true;    
+}
